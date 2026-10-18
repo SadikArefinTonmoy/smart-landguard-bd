@@ -1,0 +1,77 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "backend-tests",
+			"type": "shell",
+			"command": "python -m unittest discover -s backend/tests",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "frontend-pdf-install",
+			"type": "shell",
+			"command": "cd frontend && npm install jspdf --save",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "backend-tests-fixed",
+			"type": "shell",
+			"command": "cd backend; python -m unittest discover -s tests",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "backend-tests-fixed",
+			"type": "shell",
+			"command": "cd backend; python -m unittest discover -s tests",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "frontend-build",
+			"type": "shell",
+			"command": "cd frontend; npm run build",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "backend-tests-before-fix",
+			"type": "shell",
+			"command": "cd backend; python -m unittest discover -s tests",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "backend-tests-after-fix",
+			"type": "shell",
+			"command": "cd backend; python -m unittest discover -s tests",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "backend-tests-final",
+			"type": "shell",
+			"command": "cd backend; python -m unittest discover -s tests",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "frontend-build-final",
+			"type": "shell",
+			"command": "cd frontend; npm run build",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

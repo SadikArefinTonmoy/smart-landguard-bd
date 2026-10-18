@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: landguard-demo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: landguard_demo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in root .env first}
+      POSTGRES_DB: landguard_demo
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - landguard_demo_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U landguard_demo -d landguard_demo"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+volumes:
+  landguard_demo_pg:

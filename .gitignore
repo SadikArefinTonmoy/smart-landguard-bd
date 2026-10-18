@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.env
+backend/instance/
+backend/.env
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# JavaScript / builds
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Editor / OS
+.DS_Store
+# Additional local database secrets and encrypted demo documents
+.env.*.local
+backend/instance/encrypted_documents/
+
+# Environment variables and secrets
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python
+venv/
+*.pyc
+.pytest_cache/
+
+# React / Node.js
+dist/
+.vite/
+
+# Private files and local data
+backend/uploads/
+backend/storage/
+uploads/
+private_documents/
+*.db
+*.dump
+*.backup
+
+# Local logs and archives
+*.log
+*.zip

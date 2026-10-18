@@ -1,0 +1,85 @@
+SMART LANDGUARD BD 2.0 — PHASE 7 (2026)
+=======================================
+
+এই সংস্করণে নতুন পাঁচটি Update:
+1. Buyer লগইন করলে অ্যাডমিন পর্যালোচনা ও নমুনা রেজিস্ট্রি প্যানেল দেখা যাবে না; Buyer-এর নিজস্ব নথি ব্যবস্থাপনা আলাদা "আমার নথি"-তে থাকবে। Admin-only API-গুলো Backend role check ব্যবহার করে।
+2. "ফর্ম পরিষ্কার করুন" দিলে বর্তমান তুলনার ফলাফল/ফর্ম মুছে যাবে। সংরক্ষিত যাচাইয়ের ইতিহাস PostgreSQL থেকে মুছবে না; "সংরক্ষিত ইতিহাস দেখুন" দিয়ে দেখতে হবে। নতুন যাচাই করলে History আবার server থেকে আসবে।
+3. "যেভাবে যাচাই করবেন" Button শুধু লগইন করার আগের Home Page-এ থাকবে।
+4. পুরো পাঁচ ধাপের ব্যবহার নির্দেশিকা শুধু লগইন করার আগের Home Page-এ থাকবে।
+5. অন্য ডিভাইস থেকে একই Wi-Fi/LAN-এ Website খুলতে Run_LAN.ps1 script দেওয়া হয়েছে।
+
+IMPORTANT: পুরোনো Login/Database রক্ষা
+-----------------------------------
+- যদি পুরোনো Project-এ backend/.env এবং root .env থাকে, এগুলোর আলাদা Backup নাও। পুরোনো Password/Encryption Key নতুন করে তৈরি করবে না।
+- Docker Desktop-এর landguard-demo-postgres Container এবং তার Volume কখনো Delete করবে না।
+- NEVER run: docker compose down -v
+- নতুন ZIP-এ .env বা .venv থাকে না (গোপন কী ZIP-এ রাখা নিরাপদ নয়)।
+- পুরোনো project folder মুছে ফেলো না। নতুন ZIP আলাদা ফোল্ডারে Extract করে Backup নিয়ে প্রয়োজনে কোড Update করো।
+- নতুন PC-তে PostgreSQL তথ্য স্বয়ংক্রিয়ভাবে আসবে না। এই LAN পদ্ধতিতে শুধু MAIN PC-তে DB চলে।
+
+A. প্রথমবার MAIN PC-তে চালু করা
+-----------------------------------
+1) Docker Desktop চালু রাখো।
+2) নতুন Extract করা Folder VS Code-এ Open করো।
+3) আগে থেকেই এই Folder-এ কাজের backend/.env আছে কিনা দেখো। না থাকলে পুরোনো Backup থেকে Restore করো।
+   Backup না থাকলে, আগের Database থাকলে শুধু নিরাপদ recovery script ব্যবহার:
+      powershell -NoProfile -ExecutionPolicy Bypass -File .\START_HERE_WINDOWS.ps1
+   WARNING: যদি পুরোনো Encryption Key হারিয়ে যায়, encrypted documents Restore করা যাবে না। Script নিরাপত্তার জন্য বন্ধ হতে পারে।
+4) Normal Local mode (একই PC):
+      powershell -NoProfile -ExecutionPolicy Bypass -File .\Run_Backend.ps1
+   অন্য Terminal-এ:
+      powershell -NoProfile -ExecutionPolicy Bypass -File .\Run_Frontend.ps1
+   Open: http://localhost:4173
+
+B. MAIN PC থেকে LAN চালু করার পদ্ধতি
+-------------------------------------
+- MAIN PC ও অন্য Phone/Laptop একই বিশ্বাসযোগ্য Wi-Fi Router-এ যুক্ত থাকবে।
+- Windows Network Profile "Private" করতে হবে (Settings > Network & internet > Wi-Fi/Ethernet > Properties)।
+- একই সময়ে পুরোনো Run_Backend.ps1 এবং Run_Frontend.ps1 Terminal বন্ধ রেখে Run_LAN.ps1 ব্যবহার করো।
+- VS Code PowerShell (main project folder):
+      powershell -NoProfile -ExecutionPolicy Bypass -File .\Run_LAN.ps1
+- এটি ২টি Server Window খুলে MAIN PC-এর Private IP দেখাবে। উদাহরণ:
+      http://192.168.1.105:4173
+  (192.168.1.105 শুধু উদাহরণ; script তোমার প্রকৃত IP দেখাবে।)
+- অন্য Device-এ Chrome/Edge খুলে ওই URL দাও; Node/Python/PostgreSQL Install লাগবে না।
+- Main PC, Docker Desktop এবং দুটি Server Window চালু রাখতে হবে।
+
+C. অন্য Device থেকে পেজ আসছে না?
+---------------------------------
+1) Router-এ AP Isolation/Client Isolation চালু থাকলে বন্ধ করো। Guest Wi-Fi সাধারণত কাজ করে না।
+2) Main PC IP `ipconfig` দিয়ে দেখো। Script ভুল IP দেখালে:
+      powershell -NoProfile -ExecutionPolicy Bypass -File .\Run_LAN.ps1 -IPv4 192.168.1.105
+3) Windows Firewall Block করলে, Main PC-তে Windows PowerShell "Run as Administrator" দিয়ে:
+      powershell -NoProfile -ExecutionPolicy Bypass -File .\Run_LAN.ps1 -AddFirewallRule
+   এই নিয়ম শুধু Private profile-এর LocalSubnet থেকে TCP 4173 পোর্ট allow করে।
+4) Main PC-র Browser থেকে test করো:
+      http://localhost:4173/api/health
+      http://localhost:4173
+   LAN-এ অন্য Device থেকে:
+      http://<MAIN_PC_IP>:4173/api/health
+5) Login সমস্যা হলে: LAN script দিয়ে Backend ও Frontend উভয়ই চালু করো।
+   শুধু পুরোনো Run_Backend.ps1-এ backend চালালে LAN Origin CSRF check fail হতে পারে।
+6) Backend test command (local only; password hidden):
+      .\backend\.venv\Scripts\python.exe scripts\check_login_flow.py --email admin@example.test
+
+Security
+--------
+- এটি শিক্ষামূলক DEMO, সরকারী ভূমি ডাটাবেস নয় এবং সরকারি যাচাইয়ের বিকল্প নয়।
+- Local HTTP encrypted নয়। আসল NID, ব্যক্তিগত দলিল, সংবেদনশীল তথ্য Upload করবে না।
+- Public Internet, Router Port Forwarding, ngrok অথবা Cloud Tunnel-এ এই Development Server প্রকাশ করবে না।
+- Flask (port 8000) ও PostgreSQL (port 5432) শুধু Main PC loopback-এ থাকবে।
+- LAN URL শুধু নির্দিষ্ট PRIVATE subnet-এ শেয়ার করো।
+
+Tests: Source regression checks included in backend/tests/test_phase7_ui_lan.py.
+
+D. পুরোনো Working Project Folder থাকলে শুধু CODE Update (Recommended)
+------------------------------------------------------------------
+1) নতুন ZIP আলাদা নতুন Folder-এ Extract করো, যেমন:
+     D:\land2\LandGuard_Phase7_New\Smart_LandGuard_BD_2.0
+2) পুরোনো working project যেমন:
+     D:\land2\Smart_LandGuard_BD_2.0
+3) নতুন Extract করা Project Root থেকে এই Command চালাও:
+     powershell -NoProfile -ExecutionPolicy Bypass -File .\APPLY_PHASE7_TO_EXISTING.ps1 -ExistingProject "D:\land2\Smart_LandGuard_BD_2.0"
+4) এতে frontend code-এর Backup তৈরি হবে; root .env, backend/.env, backend/instance, .venv, Docker Volume অপরিবর্তিত থাকবে।
+5) তারপর পুরোনো Project Folder-এ গিয়ে Run_LAN.ps1 চালাও।
+6) অতিরিক্ত Database Creation Script চালানোর প্রয়োজন নেই।

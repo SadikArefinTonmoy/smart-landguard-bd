@@ -1,0 +1,45 @@
+SMART LANDGUARD BD 2.0 — NEW FULL PROJECT / WINDOWS SETUP (2026)
+============================================================
+
+এই ZIP-এ Full Frontend, Backend, PostgreSQL schema, 12 demo records seed এবং safe setup scripts রয়েছে।
+এটিকে আগের ZIP-এর সঙ্গে merge করার দরকার নেই। পুরোনো Data রাখতে চাইলে Docker volume delete করবেন না।
+
+1) ZIP Extract করে folder দিন: D:\land2\Smart_LandGuard_BD_2.0
+   যদি একই নামে পুরোনো folder থেকে যায়, আগে সেটির গোপন .env, backend/.env, backend/instance সংরক্ষণ করুন।
+   Source folder replace করলে volume মুছে যায় না, কিন্তু হারানো encryption key স্বয়ংক্রিয়ভাবে উদ্ধার হয় না।
+
+2) Docker Desktop Engine চালু করুন। VS Code-এ project ROOT folder খুলুন।
+
+3) VS Code PowerShell Terminal:
+   cd D:\land2\Smart_LandGuard_BD_2.0
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\START_HERE_WINDOWS.ps1
+
+   Existing Docker container থাকলে এটি তার Password ব্যবহার করে missing local settings ফিরিয়ে আনবে,
+   কিন্তু আগের Document metadata/encrypted vault file থাকলে নতুন Key তৈরির আগে STOP করবে।
+   New Docker installation হলে নতুন local demo credentials/setup তৈরি করবে।
+   Existing database landguard_fresh_2026 থাকলে সেটিই বেছে নেবে। Otherwise old landguard_demo।
+   Existing user accounts, PostgreSQL volume বা table মুছে ফেলে না।
+
+4) Terminal 1 (Backend):
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\Run_Backend.ps1
+
+5) Terminal 2 (Frontend):
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\Run_Frontend.ps1
+
+6) Browser: http://localhost:4173
+   Backend: http://localhost:8000/api/health
+   Frontend proxy check: http://localhost:4173/api/health
+
+7) Existing admin account থাকলে আগের email/password ব্যবহার করুন। Account না থাকলে:
+   cd D:\land2\Smart_LandGuard_BD_2.0\backend
+   .\.venv\Scripts\python.exe -m app.manage_users create --role admin --email admin@example.test --name "Demo Admin"
+   Password terminal-এ নিজে দিন (12–128 characters), ChatGPT-এ পাঠাবেন না।
+
+8) Login/session test (Both servers on):
+   cd D:\land2\Smart_LandGuard_BD_2.0
+   .\backend\.venv\Scripts\python.exe scripts\check_login_flow.py --email admin@example.test
+
+NEVER DO: docker compose down -v, share .env, run fresh DB script over existing database.
+
+NOTE: No real government API is connected. 12 records are demo records, not official evidence.
+This is a LOCAL DEMO prototype, not security-approved for personal documents or public hosting.
